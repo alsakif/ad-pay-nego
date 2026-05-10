@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad Payment Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1a56db;
+      --blue-dark: #1244b5;
+      --blue-light: #eff4ff;
+      --blue-mid: #c7d7fd;
+      --green: #057a55;
+      --green-bg: #def7ec;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text: #0f172a;
+      --text-2: #475569;
+      --text-3: #94a3b8;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .07), 0 4px 16px rgba(0, 0, 0, .05);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, .10), 0 2px 8px rgba(0, 0, 0, .06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface-2);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ── Top nav ── */
+    .nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--blue);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .nav-sub {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .rate-pill {
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .rate-pill svg {
+      width: 12px;
+      height: 12px;
+      stroke: var(--blue);
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 800px) {
+      .page {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        padding: 40px 32px 80px;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .page {
+        padding: 48px 40px 80px;
+        gap: 32px;
+      }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-head-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--blue-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-head-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--blue);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card-head-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-head-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .card-body {
+      padding: 20px 24px 24px;
+    }
+
+    /* ── Form ── */
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    select,
+    input[type=number] {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, .12);
+    }
+
+    select:disabled {
+      background: var(--surface-3);
+      color: var(--text-3);
+      cursor: not-allowed;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── USD input with $ badge ── */
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input {
+      padding-left: 42px;
+    }
+
+    .input-prefix {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-3);
+      border-right: 1.5px solid var(--border);
+      pointer-events: none;
+    }
+
+    .input-wrap input:focus~.input-prefix {
+      border-color: var(--blue);
+    }
+
+    /* ── Rate locked ── */
+    .rate-locked {
+      height: 44px;
+      background: var(--surface-3);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+    }
+
+    .rate-locked span {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .rate-locked .lock-badge {
+      margin-left: auto;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .rate-locked svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--text-3);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* ── Payment toggle ── */
+    .pay-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .pay-toggle button {
+      background: var(--surface-3);
+      border: none;
+      padding: 11px 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background .15s, color .15s;
+    }
+
+    .pay-toggle button:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .pay-toggle button.active {
+      background: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .pay-toggle button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .bank-wrap {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .bank-wrap.show {
+      display: block;
+    }
+
+    /* ── Generate button ── */
+    .gen-btn {
+      width: 100%;
+      height: 50px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      transition: background .15s, transform .1s;
+      letter-spacing: 0.01em;
+    }
+
+    .gen-btn:hover {
+      background: var(--blue-dark);
+    }
+
+    .gen-btn:active {
+      transform: scale(0.98);
+    }
+
+    .gen-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Report ── */
+    .report-panel {
+      display: none;
+    }
+
+    .report-panel.show {
+      display: block;
+    }
+
+    .report-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .report-client-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .report-platform {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 100px;
+      margin-top: 4px;
+    }
+
+    .report-datetime {
+      font-size: 12px;
+      color: var(--text-3);
+      text-align: right;
+      line-height: 1.6;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Breakdown table */
+    .breakdown {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .breakdown tr:not(:last-child) td {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .breakdown td {
+      padding: 11px 0;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    .breakdown td:last-child {
+      text-align: right;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+
+    .breakdown .lbl {
+      color: var(--text-2);
+    }
+
+    .breakdown .hint {
+      font-size: 11px;
+      color: var(--text-3);
+      display: block;
+      margin-top: 2px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .total-row {
+      border-top: 2px solid var(--border-strong) !important;
+    }
+
+    .total-row td {
+      padding-top: 14px !important;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .total-row td:last-child {
+      color: var(--blue);
+      font-size: 17px;
+    }
+
+    /* Stamp */
+    .stamp {
+      margin-top: 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .stamp svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--blue);
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .stamp-id {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stamp-note {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    /* Action buttons */
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .wa-btn {
+      height: 46px;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: background .15s, transform .1s;
+    }
+
+    .wa-btn:hover {
+      background: #128C7E;
+    }
+
+    .wa-btn:active {
+      transform: scale(0.98);
+    }
+
+    .wa-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
+
+    .reset-btn {
+      height: 46px;
+      background: var(--surface);
+      color: var(--text-2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: border-color .15s, background .15s;
+    }
+
+    .reset-btn:hover {
+      background: var(--surface-3);
+      border-color: var(--border-strong);
+    }
+
+    .reset-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--text-3);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--surface-3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--text-3);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      max-width: 200px;
+      line-height: 1.5;
+    }
+
+    /* ── Slide-in animation ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .report-panel.show {
+      animation: fadeUp .3s ease;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    /* ── Section label ── */
+    .sec-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+      </div>
+      <div>
+        <div class="nav-title">Ad Payment Calculator</div>
+        <div class="nav-sub">Payment negotiation record</div>
+      </div>
+    </div>
+    <div class="rate-pill">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </svg>
+      1 USD = 130 BDT
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- LEFT: Input form -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
+          </div>
+          <div>
+            <div class="card-head-label">Client details</div>
+            <div class="card-head-sub">Select client and ad platform</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row2">
+            <div class="field">
+              <label>Client</label>
+              <select id="clientSel" onchange="updatePlatforms()">
+                <option value="">Select client</option>
+                <option value="HRSbd">HRSbd</option>
+                <option value="Powerix Technologies Ltd">Powerix Tech</option>
+                <option value="Ruqyah Healing">Ruqyah Healing</option>
+                <option value="Bhawal Developers Ltd">Bhawal Dev</option>
+                <option value="Sv3 Solutions">Sv3 Solutions</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Platform</label>
+              <select id="platformSel" disabled>
+                <option value="">Platform</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-head">
+          <div class="card-head-icon">
+            <svg viewBox="0 0 24 24">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div>
+            <div class="card-head-label">Amount & payment</div>
+            <div class="card-head-sub">Enter USD amount and method</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label>Exchange rate</label>
+            <div class="rate-locked">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <span>1 USD = 130 BDT</span>
+              <span class="lock-badge">Fixed</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Amount to send (USD)</label>
+            <div class="input-wrap">
+              <input type="number" id="usdInput" placeholder="e.g. 30" min="1" step="any">
+              <span class="input-prefix">$</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="field">
+            <label>Payment method</label>
+            <div class="pay-toggle">
+              <button class="active" id="btnBkash" onclick="setMethod('bkash')">
+                <svg viewBox="0 0 24 24">
+                  <rect x="5" y="2" width="14" height="20" rx="2" />
+                  <line x1="12" y1="18" x2="12.01" y2="18" />
+                </svg>
+                Bkash
+              </button>
+              <button id="btnBank" onclick="setMethod('bank')">
+                <svg viewBox="0 0 24 24">
+                  <line x1="3" y1="22" x2="21" y2="22" />
+                  <line x1="6" y1="18" x2="6" y2="11" />
+                  <line x1="10" y1="18" x2="10" y2="11" />
+                  <line x1="14" y1="18" x2="14" y2="11" />
+                  <line x1="18" y1="18" x2="18" y2="11" />
+                  <polygon points="12 2 20 7 4 7" />
+                </svg>
+                Bank
+              </button>
+            </div>
+            <div class="bank-wrap" id="bankWrap">
+              <div class="input-wrap" style="margin-top:0;">
+                <input type="number" id="bankCharge" placeholder="Bank charge (BDT flat)" min="0">
+                <span class="input-prefix" style="font-family:'DM Mono',monospace; font-size:13px;">৳</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="gen-btn" onclick="calculate()">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Generate Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Report -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <div class="card-head-label">Payment report</div>
+            <div class="card-head-sub">System-generated breakdown</div>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- Empty state -->
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </div>
+            <div class="empty-title">No report yet</div>
+            <div class="empty-sub">Fill in the form and hit Generate Report</div>
+          </div>
+
+          <!-- Report content -->
+          <div class="report-panel" id="reportPanel">
+            <div class="report-meta">
+              <div>
+                <div class="report-client-name" id="repClient"></div>
+                <div class="report-platform" id="repPlatform"></div>
+              </div>
+              <div class="report-datetime" id="repDatetime"></div>
+            </div>
+
+            <table class="breakdown" id="repTable"></table>
+
+            <div class="stamp" id="repStamp">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <div>
+                <div class="stamp-id" id="stampId"></div>
+                <div class="stamp-note" id="stampNote"></div>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button class="wa-btn" id="waBtn" onclick="shareWhatsApp()">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+                </svg>
+                Share on WhatsApp
+              </button>
+              <button class="reset-btn" onclick="resetForm()">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.96" />
+                </svg>
+                New report
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const RATE = 130;
+
+    const clients = {
+      "HRSbd": ["Facebook", "Google"],
+      "Powerix Technologies Ltd": ["Facebook", "Google"],
+      "Ruqyah Healing": ["Facebook", "Google"],
+      "Bhawal Developers Ltd": ["Facebook", "Google"],
+      "Sv3 Solutions": ["Facebook", "Google"]
+    };
+
+    let method = "bkash";
+
+    function setMethod(m) {
+      method = m;
+      document.getElementById("btnBkash").className = m === "bkash" ? "active" : "";
+      document.getElementById("btnBank").className = m === "bank" ? "active" : "";
+      document.getElementById("bankWrap").className = "bank-wrap" + (m === "bank" ? " show" : "");
+    }
+
+    function updatePlatforms() {
+      const c = document.getElementById("clientSel").value;
+      const ps = document.getElementById("platformSel");
+      ps.innerHTML = '<option value="">Select platform</option>';
+      if (clients[c]) {
+        ps.disabled = false;
+        clients[c].forEach(p => {
+          const o = document.createElement("option");
+          o.value = p; o.textContent = p; ps.appendChild(o);
+        });
+        if (clients[c].length === 1) ps.value = clients[c][0];
+      } else {
+        ps.disabled = true;
+      }
+    }
+
+    function fmt(n) {
+      return n.toLocaleString("en-BD", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function genReportId(client, platform, usd, ts) {
+      const raw = `${client}|${platform}|${usd}|${RATE}|${ts}`;
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0;
+      }
+      const h = Math.abs(hash).toString(16).toUpperCase().padStart(8, "0");
+      const prefix = ts.toString(36).toUpperCase().slice(-5);
+      return `RPT-${prefix}-${h}`;
+    }
+
+    function calculate() {
+      const client = document.getElementById("clientSel").value;
+      const platform = document.getElementById("platformSel").value;
+      const usd = parseFloat(document.getElementById("usdInput").value);
+
+      if (!client) { alert("Please select a client."); return; }
+      if (!platform) { alert("Please select a platform."); return; }
+      if (!usd || usd <= 0) { alert("Please enter a valid USD amount."); return; }
+
+      const adSpend = usd * RATE;
+      const metaCharge = adSpend * 0.15;
+      const svcCharge = adSpend * 0.30;
+
+      let payCharge = 0, payLabel = "", payHint = "";
+      if (method === "bkash") {
+        payCharge = adSpend * 0.0187;
+        payLabel = "Bkash charge";
+        payHint = "ad × 1.87%";
+      } else {
+        payCharge = parseFloat(document.getElementById("bankCharge").value) || 0;
+        payLabel = "Bank charge";
+        payHint = "flat fee";
+      }
+
+      const total = adSpend + metaCharge + svcCharge + payCharge;
+      const now = new Date();
+      const ts = now.getTime();
+      const reportId = genReportId(client, platform, usd, ts);
+
+      const dateStr = now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+      const timeStr = now.toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+
+      document.getElementById("repClient").textContent = client;
+      document.getElementById("repPlatform").textContent = platform;
+      document.getElementById("repDatetime").innerHTML = `${dateStr}<br>${timeStr}`;
+
+      const rows = [
+        ["Dollar input", `$${fmt(usd)}`, ""],
+        ["Exchange rate", `${RATE} BDT / USD`, "system-fixed"],
+        ["Ad spend", `৳${fmt(adSpend)}`, `$${usd} × ${RATE}`],
+        ["Meta charge (15%)", `৳${fmt(metaCharge)}`, "ad spend × 15%"],
+        ["Service charge (30%)", `৳${fmt(svcCharge)}`, "ad spend × 30%"],
+        [payLabel, `৳${fmt(payCharge)}`, payHint],
+      ];
+
+      let html = rows.map(([l, v, h]) =>
+        `<tr><td class="lbl">${l}${h ? `<span class="hint">${h}</span>` : ""}</td><td>${v}</td></tr>`
+      ).join("");
+      html += `<tr class="total-row"><td>Total payable</td><td>৳${fmt(total)}</td></tr>`;
+      document.getElementById("repTable").innerHTML = html;
+
+      document.getElementById("stampId").textContent = reportId;
+      document.getElementById("stampNote").textContent = `System-generated · ${dateStr} ${timeStr} · Rate locked ${RATE} BDT/USD`;
+
+      window._reportData = { client, platform, usd, adSpend, metaCharge, svcCharge, payCharge, payLabel, total, dateStr, timeStr, reportId };
+
+      document.getElementById("emptyState").style.display = "none";
+      const panel = document.getElementById("reportPanel");
+      panel.className = "report-panel show";
+
+      // On mobile, scroll to report
+      if (window.innerWidth < 800) {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function shareWhatsApp() {
+      const d = window._reportData;
+      if (!d) return;
+      const msg =
+        `📊 *Payment Report*
+Client: ${d.client} · ${d.platform}
+🗓 ${d.dateStr} ${d.timeStr}
+────────────────
+Dollar input: $${d.usd.toFixed(2)}
+Exchange rate: ${RATE} BDT/USD (fixed)
+Ad spend: ৳${d.adSpend.toFixed(2)}
+Meta charge (15%): ৳${d.metaCharge.toFixed(2)}
+Service charge (30%): ৳${d.svcCharge.toFixed(2)}
+${d.payLabel}: ৳${d.payCharge.toFixed(2)}
+────────────────
+💰 *Total: ৳${d.total.toFixed(2)}*
+
+🔐 Report ID: ${d.reportId}
+_System-generated · Cannot be edited manually_`;
+
+      const waUrl = "https://wa.me/?text=" + encodeURIComponent(msg);
+      window.open(waUrl, "_blank");
+    }
+
+    function resetForm() {
+      document.getElementById("clientSel").value = "";
+      document.getElementById("platformSel").innerHTML = '<option value="">Platform</option>';
+      document.getElementById("platformSel").disabled = true;
+      document.getElementById("usdInput").value = "";
+      document.getElementById("bankCharge").value = "";
+      setMethod("bkash");
+      document.getElementById("emptyState").style.display = "";
+      document.getElementById("reportPanel").className = "report-panel";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+
+</html>
